@@ -1,0 +1,11 @@
+records:
+- source_folder: /volume1/源strm文件夹
+  target_folder: /volume1/转换后strm文件夹
+  search_string: /源路径
+  replacement_string: /目标路径
+  id: ce4e77bb-a70b-46b6-9fcc-2a1075885c99
+- source_folder: C:\strmconv\source
+  target_folder: C:\strmconv\target
+  search_string: http://
+  replacement_string: smb://
+  id: 4c00b5c5-fce6-4b15-ab30-28066bd81538
