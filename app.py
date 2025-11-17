@@ -345,16 +345,16 @@ DASHBOARD_TEMPLATE = """
                             <small class="form-text text-muted">转换后文件保存的路径</small>
                         </div>
                         <div class="mb-3">
-                            <label for="configSearchString" class="form-label">搜索字符串 <span class="text-danger">*</span></label>
+                            <label for="configSearchString" class="form-label">搜索字符串</label>
                             <input type="text" class="form-control" id="configSearchString" 
-                                   placeholder="/old/path" required>
-                            <small class="form-text text-muted">在 .strm 文件中要搜索的字符串</small>
+                                   placeholder="/old/path (留空表示仅同步，不转换)">
+                            <small class="form-text text-muted">在 .strm 文件中要搜索的字符串（留空表示仅同步，不转换）</small>
                         </div>
                         <div class="mb-3">
-                            <label for="configReplacementString" class="form-label">替换字符串 <span class="text-danger">*</span></label>
+                            <label for="configReplacementString" class="form-label">替换字符串</label>
                             <input type="text" class="form-control" id="configReplacementString" 
-                                   placeholder="/new/path" required>
-                            <small class="form-text text-muted">用于替换搜索字符串的字符串</small>
+                                   placeholder="/new/path (留空表示仅同步，不转换)">
+                            <small class="form-text text-muted">用于替换搜索字符串的字符串（留空表示仅同步，不转换）</small>
                         </div>
                     </form>
                 </div>
@@ -553,11 +553,13 @@ DASHBOARD_TEMPLATE = """
                 replacement_string: document.getElementById('configReplacementString').value.trim()
             };
             
-            // Validate
-            if (!record.source_folder || !record.target_folder || !record.search_string || !record.replacement_string) {
-                showMessage('所有字段都是必填项', 'danger');
+            // Validate (only source_folder and target_folder are required)
+            if (!record.source_folder || !record.target_folder) {
+                showMessage('源文件夹和目标文件夹是必填项', 'danger');
                 return;
             }
+            // search_string and replacement_string can be empty (for sync without conversion)
+            // They are always strings (even if empty) after trim(), so no additional validation needed
             
             // Save the record
             fetch(`/api/config/record/${currentEditingRecordId}`, {
@@ -844,10 +846,16 @@ def update_record(record_id):
         new_record = data['record']
         
         # Validate record fields
-        required_fields = ['source_folder', 'target_folder', 'search_string', 'replacement_string']
-        for field in required_fields:
-            if field not in new_record or not isinstance(new_record[field], str) or not new_record[field].strip():
-                return jsonify({'success': False, 'message': f'Missing or invalid field: {field}'}), 400
+        # source_folder and target_folder are required and cannot be empty
+        if 'source_folder' not in new_record or not isinstance(new_record['source_folder'], str) or not new_record['source_folder'].strip():
+            return jsonify({'success': False, 'message': 'Missing or invalid field: source_folder'}), 400
+        if 'target_folder' not in new_record or not isinstance(new_record['target_folder'], str) or not new_record['target_folder'].strip():
+            return jsonify({'success': False, 'message': 'Missing or invalid field: target_folder'}), 400
+        # search_string and replacement_string are required but can be empty (for sync without conversion)
+        if 'search_string' not in new_record or not isinstance(new_record['search_string'], str):
+            return jsonify({'success': False, 'message': 'Missing or invalid field: search_string'}), 400
+        if 'replacement_string' not in new_record or not isinstance(new_record['replacement_string'], str):
+            return jsonify({'success': False, 'message': 'Missing or invalid field: replacement_string'}), 400
         
         # Load current config
         config = config_manager.load()

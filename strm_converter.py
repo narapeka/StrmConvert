@@ -24,8 +24,8 @@ class StrmConverter:
             with open(source_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # Replace first occurrence only
-            if search_string in content:
+            # Replace first occurrence only (skip if search_string is empty for sync without conversion)
+            if search_string and search_string in content:
                 content = content.replace(search_string, replacement_string, 1)
             
             return content

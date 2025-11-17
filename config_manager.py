@@ -104,6 +104,9 @@ class ConfigManager:
                     return False, f"Record {i} missing required field: {field}"
                 if not isinstance(record[field], str):
                     return False, f"Record {i} field '{field}' must be a string"
+                # Allow empty strings for search_string and replacement_string (for sync without conversion)
+                if field in ['source_folder', 'target_folder'] and not record[field].strip():
+                    return False, f"Record {i} field '{field}' cannot be empty"
         
         return True, None
     
