@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Optional, Tuple
 class ConfigManager:
     """Manages loading and saving of YAML configuration."""
     
-    def __init__(self, config_path: str = "config.yaml"):
+    def __init__(self, config_path: str = "config/config.yaml"):
         self.config_path = Path(config_path)
         self.config: Optional[Dict[str, Any]] = None
     

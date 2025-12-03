@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  strmconvert:
+    build: .
+    container_name: strmconvert
+    restart: unless-stopped
+    ports:
+      - "9115:9115"
+    volumes:
+      # 挂载配置目录以持久化配置
+      - ./config:/app/config
+      # 在此挂载您的源文件夹和目标文件夹
+      # - /path/to/your/source/folder:/mnt/source
+      # - /path/to/your/target/folder:/mnt/target
+    environment:
+      - TZ=Asia/Shanghai
+
